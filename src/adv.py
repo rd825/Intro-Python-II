@@ -58,9 +58,9 @@ while True:
     room_sc = room[user.location]  # _sc here means shortcut
     room_name = room_sc.name
     room_desc = room_sc.description
-    items = []
-    for item in room_sc.items:
-        items.append(item.name)
+    items = [item.name for item in room_sc.items if len(room_sc.items) > 0]
+    inventory = [item.name for item in user.inventory if len(
+        user.inventory) > 0]
 
     print(f'''You are at the {room_name}: '{room_desc}.'
 
@@ -78,7 +78,6 @@ Please pick a direction to go in: n(orth), e(ast), s(outh), w(est)''')
             print(
                 f'\n\nYou found the following items in the room: {items}\n\n')
         elif verb == 'take' or verb == 'get':
-            print(verb)
             if subject in items:
                 item = room_sc.items.pop(items.index(subject))
                 user.inventory.append(item)
@@ -88,7 +87,13 @@ Please pick a direction to go in: n(orth), e(ast), s(outh), w(est)''')
                 print('That item is not in this room.')
 
         elif verb == 'drop':
-            print(verb)
+            if subject in inventory:
+                item = user.inventory.pop(inventory.index(subject))
+                room_sc.items.append(item)
+                print(
+                    f'{subject.upper()} was dropped.')
+            else:
+                print('That item is not in your inventory.')
     else:
         action = action[0].lower()
 
@@ -97,7 +102,7 @@ Please pick a direction to go in: n(orth), e(ast), s(outh), w(est)''')
             break
 
         elif action == 'i':
-            print(f'Your inventory contains: {user.inventory}')
+            print(f'Your inventory contains: {inventory}')
 
         # If the user enters a cardinal direction, attempt to move there.
         elif action == 'n' or action == 'e' or action == 's' or action == 'w':
