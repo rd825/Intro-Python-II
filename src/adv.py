@@ -58,10 +58,9 @@ while True:
     room_sc = room[user.location]  # _sc here means shortcut
     room_name = room_sc.name
     room_desc = room_sc.description
-    items = ''
+    items = []
     for item in room_sc.items:
-        str = f'{item.name} '
-        items = items + str
+        items.append(item.name)
 
     print(f'''You are at the {room_name}: '{room_desc}.'
 
@@ -73,19 +72,32 @@ Please pick a direction to go in: n(orth), e(ast), s(outh), w(est)''')
 
     if len(action.split(' ', 1)) == 2:
         # do something here
-        action_sc = action.split(' ', 1)[0].lower()
-        if action_sc == 'search':
-            print('search')
-        elif action_sc == 'take' or action_sc == 'get':
-            print('take')
-        elif action_sc == 'drop':
-            print('drop')
+        verb = action.split(' ', 1)[0].lower()
+        subject = action.split(' ', 1)[1].lower()
+        if verb == 'search':
+            print(
+                f'\n\nYou found the following items in the room: {items}\n\n')
+        elif verb == 'take' or verb == 'get':
+            print(verb)
+            if subject in items:
+                item = room_sc.items.pop(items.index(subject))
+                user.inventory.append(item)
+                print(
+                    f'{subject.upper()} was added to your inventory.')
+            else:
+                print('That item is not in this room.')
+
+        elif verb == 'drop':
+            print(verb)
     else:
         action = action[0].lower()
 
         # enable the user to input 'q', 'Q', 'quit' to quit the game
         if action == 'q':
             break
+
+        elif action == 'i':
+            print(f'Your inventory contains: {user.inventory}')
 
         # If the user enters a cardinal direction, attempt to move there.
         elif action == 'n' or action == 'e' or action == 's' or action == 'w':
@@ -104,15 +116,15 @@ Please pick a direction to go in: n(orth), e(ast), s(outh), w(est)''')
                         0].lower()
             else:
                 print('''
-    -----------------------
-    | You shall not pass! |
-    -----------------------
+-----------------------
+| You shall not pass! |
+-----------------------
                 ''')
 
     # Print an error message if the movement isn't allowed.
         else:
             print('''
-    -------------------------------------
-    | ERROR: invalid action. Try again! |
-    -------------------------------------
+-------------------------------------
+| ERROR: invalid action. Try again! |
+-------------------------------------
             ''')
