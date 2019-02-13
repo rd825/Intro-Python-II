@@ -3,6 +3,7 @@
 
 
 class Player():
-    def __init__(self, location, items=[]):
+    def __init__(self, name, location, inventory=[]):
+        self.name = name
         self.location = location
-        self.items = items
+        self.inventory = inventory
