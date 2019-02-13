@@ -64,8 +64,6 @@ while True:
 
     print(f'''You are at the {room_name}: '{room_desc}.'
 
-You can `search room`. You can type `get [name]` to get any items you find.
-
 Please pick a direction to go in: n(orth), e(ast), s(outh), w(est)''')
     action = input('Enter your action: ')
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -77,23 +75,34 @@ Please pick a direction to go in: n(orth), e(ast), s(outh), w(est)''')
         if verb == 'search':
             print(
                 f'\n\nYou found the following items in the room: {items}\n\n')
+        elif verb == 'examine' or verb == 'inspect':
+            if subject in inventory:
+                item = user.inventory[inventory.index(subject)]
+                print(
+                    f'\n\nIt is {item.description}.\n\n')
+            elif subject in items:
+                item = room_sc.items[items.index(subject)]
+                print(
+                    f'\n\nIt is {item.description}.\n\n')
+            else:
+                print('\n\nThat item is not in your pack or the room.\n\n')
         elif verb == 'take' or verb == 'get':
             if subject in items:
                 item = room_sc.items.pop(items.index(subject))
                 user.inventory.append(item)
                 print(
-                    f'{subject.upper()} was added to your inventory.')
+                    f'\n\n{subject.upper()} was added to your inventory.\n\n')
             else:
-                print('That item is not in this room.')
+                print('\n\nThat item is not in this room.\n\n')
 
         elif verb == 'drop':
             if subject in inventory:
                 item = user.inventory.pop(inventory.index(subject))
                 room_sc.items.append(item)
                 print(
-                    f'{subject.upper()} was dropped.')
+                    f'\n\n{subject.upper()} was dropped.\n\n')
             else:
-                print('That item is not in your inventory.')
+                print('\n\nThat item is not in your inventory.\n\n')
     else:
         action = action[0].lower()
 
