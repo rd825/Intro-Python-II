@@ -6,9 +6,9 @@ from item import Item
 # Declare all the rooms
 
 room = {
-    'outside':  Room("Cave Entrance",
-                     "North of you, the cave mount beckons",
-                     [Item('moss', 'a clump of moss')]),
+    'cave':  Room("Cave Entrance",
+                  "North of you, the cave mount beckons",
+                  [Item('moss', 'a clump of moss')]),
 
     'foyer':    Room("Foyer", """Dim light filters in from the south. Dusty
 passages run north and east.""",
@@ -32,8 +32,8 @@ earlier adventurers. The only exit is to the south.""",
 
 # Link rooms together
 
-room['outside'].n_to = room['foyer']
-room['foyer'].s_to = room['outside']
+room['cave'].n_to = room['foyer']
+room['foyer'].s_to = room['cave']
 room['foyer'].n_to = room['grand']
 room['foyer'].e_to = room['narrow']
 room['grand'].s_to = room['foyer']
@@ -45,9 +45,9 @@ room['treasure'].s_to = room['narrow']
 # Main
 #
 
-# Make a new player object that is currently in the 'outside' room.
-
-user = Player(input("What's your name? "), 'outside')
+# Make a new player object that is currently in the 'cave' room.
+# Ask for their name.
+user = Player(input("What's your name? "), 'cave')
 
 # Write a loop that:
 #
@@ -55,52 +55,64 @@ user = Player(input("What's your name? "), 'outside')
 # * Prints the current description (the textwrap module might be useful here).
 # * Waits for user input and decides what to do.
 while True:
-    room_name = room[user.location].name
-    room_desc = room[user.location].description
-    items = []
-    for item in room[user.location].items:
-        str = f'{item.name}'
-        items.append(str)
+    room_sc = room[user.location]  # _sc here means shortcut
+    room_name = room_sc.name
+    room_desc = room_sc.description
+    items = ''
+    for item in room_sc.items:
+        str = f'{item.name} '
+        items = items + str
 
     print(f'''You are at the {room_name}: '{room_desc}.'
 
-The following items are in the room: {items}
+You can `search room`. You can type `get [name]` to get any items you find.
 
 Please pick a direction to go in: n(orth), e(ast), s(outh), w(est)''')
-    userInput = input('Enter your action: ')[0].lower()
+    action = input('Enter your action: ')
     os.system('cls' if os.name == 'nt' else 'clear')
 
-    if userInput == 'q':
-        break
+    if len(action.split(' ', 1)) == 2:
+        # do something here
+        action_sc = action.split(' ', 1)[0].lower()
+        if action_sc == 'search':
+            print('search')
+        elif action_sc == 'take' or action_sc == 'get':
+            print('take')
+        elif action_sc == 'drop':
+            print('drop')
+    else:
+        action = action[0].lower()
 
-# If the user enters a cardinal direction, attempt to move to the room there.
-    elif userInput == 'n' or 'e' or 's' or 'w':
-        if hasattr(room[user.location], f'{userInput}_to'):
-            if userInput == 'n':
-                user.location = room[user.location].n_to.name.split(' ', 1)[
-                    0].lower()
-            elif userInput == 'e':
-                user.location = room[user.location].e_to.name.split(' ', 1)[
-                    0].lower()
-            elif userInput == 's':
-                user.location = room[user.location].s_to.name.split(' ', 1)[
-                    0].lower()
-            elif userInput == 'w':
-                user.location = room[user.location].w_to.name.split(' ', 1)[
-                    0].lower()
-            elif userInput == 'q':
-                break
+        # enable the user to input 'q', 'Q', 'quit' to quit the game
+        if action == 'q':
+            break
+
+        # If the user enters a cardinal direction, attempt to move there.
+        elif action == 'n' or action == 'e' or action == 's' or action == 'w':
+            if hasattr(room[user.location], f'{action}_to'):
+                if action == 'n':
+                    user.location = room_sc.n_to.name.split(' ', 1)[
+                        0].lower()
+                elif action == 'e':
+                    user.location = room_sc.e_to.name.split(' ', 1)[
+                        0].lower()
+                elif action == 's':
+                    user.location = room_sc.s_to.name.split(' ', 1)[
+                        0].lower()
+                elif action == 'w':
+                    user.location = room_sc.w_to.name.split(' ', 1)[
+                        0].lower()
+            else:
+                print('''
+    -----------------------
+    | You shall not pass! |
+    -----------------------
+                ''')
+
+    # Print an error message if the movement isn't allowed.
         else:
             print('''
------------------------
-| You shall not pass! |
------------------------
+    -------------------------------------
+    | ERROR: invalid action. Try again! |
+    -------------------------------------
             ''')
-
-# Print an error message if the movement isn't allowed.
-    else:
-        print('''
--------------------------------------
-| ERROR: invalid action. Try again! |
--------------------------------------
-        ''')
