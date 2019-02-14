@@ -47,6 +47,7 @@ room['treasure'].s_to = room['narrow']
 
 # Make a new player object that is currently in the 'cave' room.
 # Ask for their name.
+
 user = Player(input("What's your name? "), 'cave')
 
 # Write a loop that:
@@ -77,21 +78,16 @@ Please pick a direction to go in: n(orth), e(ast), s(outh), w(est)''')
                 f'\n\nYou found the following items in the room: {items}\n\n')
         elif verb == 'examine' or verb == 'inspect':
             if subject in inventory:
-                item = user.inventory[inventory.index(subject)]
-                print(
-                    f'\n\nIt is {item.description}.\n\n')
+                user.inventory[inventory.index(subject)].examine()
             elif subject in items:
-                item = room_sc.items[items.index(subject)]
-                print(
-                    f'\n\nIt is {item.description}.\n\n')
+                room_sc.items[items.index(subject)].examine()
             else:
                 print('\n\nThat item is not in your pack or the room.\n\n')
         elif verb == 'take' or verb == 'get':
             if subject in items:
                 item = room_sc.items.pop(items.index(subject))
                 user.inventory.append(item)
-                print(
-                    f'\n\n{subject.upper()} was added to your inventory.\n\n')
+                item.onTake()
             else:
                 print('\n\nThat item is not in this room.\n\n')
 
@@ -99,8 +95,7 @@ Please pick a direction to go in: n(orth), e(ast), s(outh), w(est)''')
             if subject in inventory:
                 item = user.inventory.pop(inventory.index(subject))
                 room_sc.items.append(item)
-                print(
-                    f'\n\n{subject.upper()} was dropped.\n\n')
+                item.onDrop()
             else:
                 print('\n\nThat item is not in your inventory.\n\n')
     else:
@@ -111,7 +106,7 @@ Please pick a direction to go in: n(orth), e(ast), s(outh), w(est)''')
             break
 
         elif action == 'i':
-            print(f'Your inventory contains: {inventory}')
+            print(f'\n\nYour inventory contains: {inventory}\n\n')
 
         # If the user enters a cardinal direction, attempt to move there.
         elif action == 'n' or action == 'e' or action == 's' or action == 'w':
